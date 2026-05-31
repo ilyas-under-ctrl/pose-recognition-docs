@@ -1,0 +1,6 @@
+event_type,body_part,count
+entered_danger_volume,hand_or_arm,46
+entered_danger_volume,head,4
+near_miss,hand_or_arm,8
+near_miss,head,5
+no_danger_event,none,9

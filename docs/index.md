@@ -19,6 +19,7 @@ The research pipeline combines trajectory danger risk, attention risk, and blous
 - [Architecture and Annotation](architecture_and_annotation.md): project framing, defensible claims, dataset grounding, annotation strategy, and reliability boundaries.
 - [Annotation Tool Usage](annotation_tool_usage.md): how to run the browser annotation tool, define the danger zone, label videos, and validate annotations.
 - [ML Autonomous Training Runbook](ml_autonomous_training_runbook.md): durable research plan, model targets, augmentation policy, evaluation criteria, experiment status, and final acceptance criteria.
+- [Project Artifacts](artifacts.md): downloadable reports, presentation decks, and pointers to the experiment notebooks.
 
 ## Quick Start
 

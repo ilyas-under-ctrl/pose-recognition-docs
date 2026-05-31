@@ -8,6 +8,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Artifacts: artifacts.md
   - Architecture and Annotation: architecture_and_annotation.md
   - Annotation Tool Usage: annotation_tool_usage.md
   - ML Autonomous Training Runbook: ml_autonomous_training_runbook.md
