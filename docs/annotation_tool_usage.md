@@ -1,24 +1,31 @@
 # Annotation Tool Usage
 
-Recommended browser app:
+To make this proof-of-concept repository immediately runnable, we have whitelisted and pushed a lightweight sample video directly into Git:
+- **Sample Video Path**: `captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
+
+When you run the web annotator server or the legacy Tkinter tool, this video will automatically appear in the active video queue, allowing you to try out the canvas editing, segment boundary marking, and event timing timeline with no extra setup.
+
+## Recommended Web Annotator (Preferred UI)
+
+Run the Python web server in the root of the repository:
 
 ```powershell
 python web_annotator_server.py
 ```
 
-Open:
+Then open your browser and navigate to:
 
 ```text
 http://127.0.0.1:8765
 ```
 
-or double-click:
+Alternatively, on Windows you can double-click:
 
 ```text
 run_web_annotation_tool.bat
 ```
 
-The browser version is the preferred UI. It uses native video playback, canvas overlays, and a video-editor-style timeline while saving the same CSV/JSON annotation files.
+The browser version is the preferred UI. It uses native video playback, canvas overlays, and a video-editor-style timeline while saving the same CSV/JSON annotation files under `annotations/`.
 
 ![Browser annotation tool preview](assets/images/web_annotator_preview.png)
 

@@ -21,31 +21,31 @@ The research pipeline combines trajectory danger risk, attention risk, and blous
 - [ML Autonomous Training Runbook](ml_autonomous_training_runbook.md): durable research plan, model targets, augmentation policy, evaluation criteria, experiment status, and final acceptance criteria.
 - [Project Artifacts](artifacts.md): downloadable reports, presentation decks, and pointers to the experiment notebooks.
 
-## Quick Start
+## Quick Start & Sample Video
 
-Install the project dependencies:
+To allow immediate, out-of-the-box execution, a lightweight sample video from the dataset is whitelisted and pushed directly in this Git repository:
+- **Path**: `captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
 
-```powershell
-python -m pip install -r requirements.txt
-```
+### Run instructions:
 
-Run the browser annotation tool:
+1. **Install dependencies**:
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
 
-```powershell
-python web_annotator_server.py
-```
+2. **Run the browser annotation tool**:
+   ```powershell
+   python web_annotator_server.py
+   ```
 
-Open:
+3. **Annotate in your browser**:
+   Navigate to [http://127.0.0.1:8765](http://127.0.0.1:8765). The sample video will automatically load in the active queue. You can practice defining the danger zone polygon, selecting segment attention/PPE labels, and marking danger timeline event timestamps.
 
-```text
-http://127.0.0.1:8765
-```
-
-Validate annotations after labeling:
-
-```powershell
-python validate_annotations.py
-```
+4. **Validate annotations**:
+   Ensure all saved outputs are fully syntactically correct and conform to schema:
+   ```powershell
+   python validate_annotations.py
+   ```
 
 ## Scope
 
