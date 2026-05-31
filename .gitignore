@@ -1,0 +1,10 @@
+*
+
+!.gitignore
+!.readthedocs.yaml
+!README.md
+!mkdocs.yml
+!docs/
+!docs/**
+
+site/

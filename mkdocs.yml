@@ -1,0 +1,19 @@
+site_name: Pose Recognition Machine Safety
+site_description: Documentation for the fixed-camera pose recognition machine-safety proof of concept.
+site_author: Ilyas
+
+theme:
+  name: readthedocs
+  highlightjs: true
+
+nav:
+  - Home: index.md
+  - Architecture and Annotation: architecture_and_annotation.md
+  - Annotation Tool Usage: annotation_tool_usage.md
+  - ML Autonomous Training Runbook: ml_autonomous_training_runbook.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
