@@ -40,6 +40,8 @@ video frame
 -> fused risk state
 ```
 
+![Risk pipeline and policy diagram](assets/images/pipeline_policy_diagram.png)
+
 Use separate labels and model heads, not one monolithic label:
 
 ```text

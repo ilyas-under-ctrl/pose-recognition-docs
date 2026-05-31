@@ -20,6 +20,12 @@ run_web_annotation_tool.bat
 
 The browser version is the preferred UI. It uses native video playback, canvas overlays, and a video-editor-style timeline while saving the same CSV/JSON annotation files.
 
+![Browser annotation tool preview](assets/images/web_annotator_preview.png)
+
+The older Tkinter tool is also documented because it remains useful as a fallback.
+
+![Tkinter annotation tool interface](assets/images/annotation_tool_interface.png)
+
 ## Video Loading Speed
 
 The original clips are encoded as `mp4v`, which many browsers do not play directly. The web annotator keeps your original videos untouched and creates browser-playable H.264 copies in `.web_media_cache/`.
