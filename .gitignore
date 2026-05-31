@@ -13,7 +13,34 @@
 !presentations/
 !presentations/**
 
+# Whitelist Annotations Tool & Support Scripts
+!web_annotator_server.py
+!annotation_tool.py
+!prepare_web_media_cache.py
+!validate_annotations.py
+!clean_annotations.py
+!run_web_annotation_tool.bat
+!run_annotation_tool.bat
+!prepare_web_media_cache.bat
+!requirements.txt
+!captures_manifest.csv
+
+# Whitelist Annotations directory
+!annotations/
+!annotations/**
+
+# Whitelist Web Annotator UI assets
+!web_annotator/
+!web_annotator/**
+
+# Whitelist Sample Video
+!captures/
+!captures/ilyas/
+!captures/ilyas/unsafe/
+!captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4
+
 site/
 academic_report/*.aux
 academic_report/*.log
 academic_report/*.out
+

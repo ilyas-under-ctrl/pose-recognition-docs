@@ -1,0 +1,167 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Machine Safety Annotator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="queue-pane">
+        <header class="pane-header">
+          <h1>Annotation Queue</h1>
+          <p id="progressText">Loading dataset...</p>
+        </header>
+        <div class="queue-tools">
+          <input id="searchInput" type="search" placeholder="Search actor, label, filename" />
+          <select id="filterSelect">
+            <option value="all">All</option>
+            <option value="safe">Safe</option>
+            <option value="unsafe">Unsafe</option>
+            <option value="needs_review">Needs review</option>
+            <option value="reviewed">Reviewed</option>
+          </select>
+        </div>
+        <div class="legend">âœ“ reviewed Â· E event only Â· S segment only Â· â—‹ untouched</div>
+        <div id="videoList" class="video-list"></div>
+        <div class="queue-nav">
+          <button id="prevBtn">P Prev</button>
+          <button id="nextBtn">N Next</button>
+        </div>
+        <section class="shortcut-panel">
+          <h2>Shortcuts</h2>
+          <p>Space play/pause Â· â†/â†’ frame Â· Shift+â†/â†’ second Â· F review 8x</p>
+          <p>A/D attention · R/B blouse · 1/2 danger sources</p>
+          <p>W whole segment Â· M physical entry Â· O risk onset Â· G no danger Â· X reset clip Â· Z edit zone</p>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="workspace-header">
+          <div>
+            <h2 id="workspaceTitle">Frame Workspace</h2>
+            <p id="clipMeta">Choose a clip to begin.</p>
+          </div>
+          <div id="reviewStatus" class="status-pill">Needs review</div>
+        </header>
+
+        <section class="video-stage">
+          <video id="video" preload="metadata"></video>
+          <canvas id="zoneCanvas"></canvas>
+          <div id="stageStatus" class="stage-status">Preparing video...</div>
+        </section>
+
+        <input id="scrubber" class="scrubber" type="range" min="0" max="1" step="0.001" value="0" />
+
+        <section class="timeline" id="timeline">
+          <canvas id="timelineCanvas"></canvas>
+        </section>
+
+        <section class="transport">
+          <button id="playBtn">Space Play</button>
+          <button id="prevFrameBtn">&lt; Frame</button>
+          <button id="nextFrameBtn">Frame &gt;</button>
+          <button id="backSecBtn">-1 sec</button>
+          <button id="fwdSecBtn">+1 sec</button>
+          <label>Speed
+            <select id="speedSelect">
+              <option>1x</option>
+              <option>2x</option>
+              <option>4x</option>
+              <option selected>8x</option>
+              <option>16x</option>
+              <option>24x</option>
+            </select>
+          </label>
+          <label class="checkline"><input id="autoNext" type="checkbox" /> Auto-next</label>
+          <button id="reviewBtn">F Zone Review</button>
+          <button id="prepareCacheBtn">Prepare All Clips</button>
+          <span id="timeReadout"></span>
+        </section>
+        <div id="cacheStatus" class="cache-status"></div>
+
+        <section class="controls-grid">
+          <div class="panel">
+            <h3>Clip Labels</h3>
+            <div class="field-row">
+              <span>Attention</span>
+              <div class="segmented" data-group="attention">
+                <button data-value="attentive">A attentive</button>
+                <button data-value="distracted">D distracted</button>
+              </div>
+            </div>
+            <div class="field-row">
+              <span>Blouse</span>
+              <div class="segmented" data-group="blouse">
+                <button data-value="properly_worn">R proper</button>
+                <button data-value="badly_worn">B bad</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Danger Event</h3>
+            <div class="field-row">
+              <span>Timing</span>
+              <div class="segmented" data-group="eventRole">
+                <button data-value="physical_entry">M physical entry</button>
+                <button data-value="risk_onset">O risk onset</button>
+              </div>
+            </div>
+            <div class="field-row">
+              <span>Sources</span>
+              <div class="checks">
+                <label><input type="checkbox" class="sourceCheck" value="hand_or_arm" checked /> 1 hand/arm</label>
+                <label><input type="checkbox" class="sourceCheck" value="head" /> 2 head</label>
+              </div>
+            </div>
+            <div class="field-row">
+              <span>Spatial</span>
+              <select id="spatialSelect">
+                <option>inside_volume</option>
+                <option>near_volume</option>
+                <option>outside_volume</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <span>Event</span>
+              <select id="eventTypeSelect">
+                <option>entered_danger_volume</option>
+                <option>near_miss</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Notes</h3>
+            <input id="notesInput" placeholder="Only for ambiguity: occlusion, above projection, unclear source" />
+            <p class="hint">Red pins are physical entry. Amber pins are risk onset. Drag pins to correct timestamps.</p>
+          </div>
+        </section>
+
+        <section class="actions">
+          <button id="startSegmentBtn">S Start Segment</button>
+          <button id="endSegmentBtn">E End + Save</button>
+          <button id="wholeSegmentBtn">W Whole Clip</button>
+          <button id="markPhysicalBtn" class="danger">M Physical Entry</button>
+          <button id="markRiskBtn" class="warning">O Risk Onset</button>
+          <button id="noDangerBtn">G No Danger</button>
+          <button id="resetClipBtn" class="danger">X Reset Clip</button>
+          <button id="undoEventBtn">Undo Event</button>
+          <button id="undoSegmentBtn">Undo Segment</button>
+          <button id="zoneEditBtn">Z Edit Zone</button>
+          <button id="saveZoneBtn">Ctrl+S Save Zone</button>
+        </section>
+
+        <section class="saved">
+          <h3>Saved annotations for this video</h3>
+          <pre id="savedSummary">No clip selected.</pre>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
+

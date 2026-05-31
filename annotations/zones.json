@@ -1,0 +1,45 @@
+{
+  "zones": [
+    {
+      "zone_id": "machine_danger_volume",
+      "shape": "projected_volume_polygon",
+      "image_width": 1440,
+      "image_height": 720,
+      "points": [
+        [
+          640,
+          522
+        ],
+        [
+          575,
+          714
+        ],
+        [
+          916,
+          715
+        ],
+        [
+          942,
+          545
+        ],
+        [
+          913,
+          499
+        ],
+        [
+          836,
+          528
+        ]
+      ],
+      "active_body_parts": [
+        "right_wrist",
+        "left_wrist",
+        "right_elbow",
+        "left_elbow",
+        "head",
+        "torso"
+      ],
+      "notes": "Single fixed-camera projection of the machine danger volume. Use body part, motion, and z/pseudo-depth features downstream; do not treat this polygon as true metric 3D."
+    }
+  ]
+}

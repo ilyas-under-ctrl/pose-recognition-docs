@@ -131,11 +131,11 @@ Tous les modèles de danger restent évalués par rapport au même événement o
 
 La supervision de ce score unique utilise nos annotations temporelles. Une fenêtre est positive entre \texttt{risk\_onset} et \texttt{physical\_entry}: c'est la période où un technicien ou un responsable sécurité pourrait raisonnablement commencer à voir le risque, mais avant l'entrée objective dans le volume dangereux. Ensuite, l'évaluation reste stricte: quand le score dépasse un seuil, on mesure si ce déclenchement arrive avant \texttt{physical\_entry}, puis combien de temps avant.
 
-\subsection{Architectures retenues}
-Les deux familles utilisent les mêmes types de variables d'entrée: coordonnées de pose, visibilité, distances à la zone dangereuse, indicateurs d'intérieur de zone, vitesse et accélération. Elles ne répondent pas exactement au même usage opérationnel. Le TCN est retenu pour l'alerte opérateur avec un score unique de risque visible maintenant. Le GRU exact-entry est gardé pour la question plus étroite de l'arrêt court horizon, quand on veut savoir si l'entrée physique est devenue imminente à quelques dixièmes de seconde près.
+\subsection{Architectures du système}
+Le système repose sur les mêmes variables d'entrée causales dans les deux cas: coordonnées de pose, visibilité, distances à la zone dangereuse, indicateurs d'intérieur de zone, vitesse et accélération. Nous distinguons ensuite deux usages opérationnels. Le TCN porte l'alerte opérateur avec un score unique de risque visible maintenant. Le GRU exact-entry sert le stop court horizon, quand la question devient celle de l'imminence de l'entrée physique à quelques dixièmes de seconde près.
 
-\paragraph{TCN60 comme modèle d'alerte retenu.}
-Le TCN60 reçoit une fenêtre causale de $60 \times 54$ features, soit environ deux secondes d'historique. Il applique une projection \texttt{Conv1d} $54 \rightarrow 96$, puis quatre blocs TCN résiduels avec dilatations $1,2,4,8$. Chaque bloc contient deux convolutions 1D, \texttt{BatchNorm}, \texttt{ReLU} et un dropout de $0,18$. La tête concatène la moyenne temporelle et le dernier pas temporel, puis applique un MLP $192 \rightarrow 96 \rightarrow 1$. La sortie unique est \texttt{risk\_present\_now}. Dans nos résultats, la variante \texttt{tcn60\_aug\_bce} donne le meilleur compromis entre couverture des entrées et faible bruit.
+\paragraph{TCN60 pour l'alerte opérateur.}
+Le TCN60 reçoit une fenêtre causale de $60 \times 54$ features, soit environ deux secondes d'historique. Il applique une projection \texttt{Conv1d} $54 \rightarrow 96$, puis quatre blocs TCN résiduels avec dilatations $1,2,4,8$. Chaque bloc contient deux convolutions 1D, \texttt{BatchNorm}, \texttt{ReLU} et un dropout de $0,18$. La tête concatène la moyenne temporelle et le dernier pas temporel, puis applique un MLP $192 \rightarrow 96 \rightarrow 1$. La sortie unique est \texttt{risk\_present\_now}. Dans ce rapport, la politique d'alerte principale s'appuie sur la variante \texttt{tcn60\_aug\_bce}, parce qu'elle combine une avance utile et un bruit contenu.
 
 \paragraph{GRU exact-entry comme signal d'arrêt court horizon.}
 Le modèle GRU conservé pour l'arrêt automatique travaille sur une fenêtre causale plus courte et sur une cible plus stricte: non pas ``il y a un risque visible maintenant'', mais ``l'entrée physique est-elle devenue imminente?''. Dans le rapport, nous retenons son score \texttt{score\_by\_02}, c'est-à-dire le signal le plus proche de l'horizon $0,2$ s avant entrée. Ce GRU sert à auditer le compromis d'un signal de stop très tardif mais plus fiable à très courte échéance.
@@ -143,16 +143,16 @@ Le modèle GRU conservé pour l'arrêt automatique travaille sur une fenêtre ca
 En résumé, le score principal ne demande pas au modèle de sortir un temps restant. Il demande seulement un niveau de certitude instantané sur la présence d'un risque visible. L'avance temporelle n'est pas une sortie du modèle: elle est mesurée après coup en comparant le premier déclenchement au temps réel d'entrée physique.
 
 \subsection{Méthodes d'ensemble et fonctions de perte}
-Le score d'alerte n'est pas choisi à partir d'un seul entraînement isolé. Pour la sortie unique \texttt{risk\_present\_now}, nous avons comparé plusieurs variantes directes sur les mêmes splits répétés:
+Pour la sortie unique \texttt{risk\_present\_now}, nous évaluons plusieurs variantes directes sur les mêmes splits répétés:
 \begin{itemize}[leftmargin=*]
 \item \texttt{tcn60\_aug\_bce}: TCN60 avec augmentation temporelle et perte BCE;
 \item \texttt{tcn60\_aug\_focal}: TCN60 avec augmentation temporelle et perte focal.
 \end{itemize}
-Séparément, pour la question de stop court horizon, nous avons gardé une expérience GRU exact-entry, évaluée comme signal d'imminence et non comme alerte opérateur.
+En parallèle, le stop court horizon repose sur une expérience GRU exact-entry, évaluée comme signal d'imminence et non comme alerte opérateur.
 
 Le terme \textbf{same-split} est important: les modèles combinés utilisent les mêmes séparations train, validation et test par vidéo parente. On ne mélange donc pas des prédictions venant de splits incompatibles, et on évite qu'une fenêtre d'une même vidéo aide indirectement à prédire une autre fenêtre de test. L'ensemble est volontairement simple: on moyenne les probabilités au lieu d'apprendre une fusion plus complexe. Ce choix réduit la variance sans ajouter beaucoup de paramètres, ce qui convient mieux à notre petit dataset.
 
-\textbf{BCE} signifie \emph{Binary Cross Entropy}. C'est la perte standard pour une sortie binaire comme \texttt{risk\_present\_now}. Elle pénalise directement les erreurs entre la probabilité prédite et le label 0/1. Nous l'avons gardée parce qu'elle donne une baseline stable et facile à interpréter. Dans nos entraînements, elle est utilisée avec un poids positif pour compenser le fait que les fenêtres positives sont beaucoup moins nombreuses que les fenêtres négatives.
+\textbf{BCE} signifie \emph{Binary Cross Entropy}. C'est la perte standard pour une sortie binaire comme \texttt{risk\_present\_now}. Elle pénalise directement les erreurs entre la probabilité prédite et le label 0/1. Nous l'utilisons comme référence stable et facile à interpréter. Dans nos entraînements, elle est associée à un poids positif pour compenser le fait que les fenêtres positives sont beaucoup moins nombreuses que les fenêtres négatives.
 
 \textbf{Focal loss} part de la BCE mais donne moins de poids aux exemples faciles et plus de poids aux exemples difficiles. Ici, cela aide parce que la majorité des fenêtres sont clairement négatives, alors que les fenêtres intéressantes sont proches de l'entrée et plus rares. Avec \texttt{gamma}=2, le modèle est poussé à mieux apprendre ces cas ambigus sans être dominé par les nombreux négatifs faciles.
 
@@ -189,7 +189,7 @@ et une règle de haute sensibilité:
 \[
 S_{\mathrm{high}} = \mathrm{clip}\left(D + (1-D)(0,40A + 0,30P + 0,20AP), 0, 1\right).
 \]
-Ces variantes sont utiles pour comparer des politiques d'alerte plus agressives. La conclusion retenue reste prudente: attention et blouse/PPE modifient la sensibilité de l'alerte opérateur, mais le danger physique reste porté par la séquence pose-zone.
+Ces variantes servent à explorer des politiques d'alerte plus sensibles. Dans notre lecture, attention et blouse/PPE modifient la sensibilité de l'alerte opérateur, mais le danger physique reste porté par la séquence pose-zone.
 
 \subsection{Entraînement et résultats des modèles attention/blouse}
 Les modèles attention et blouse/PPE sont entraînés sur des crops RGB de la personne, pas sur la séquence de pose complète. À partir des bounding boxes de pose, on extrait un crop autour de l'opérateur avec une marge de 12\%. Les crops sont pris environ toutes les 15 frames, avec un maximum de 24 crops par vidéo, puis redimensionnés en $224 \times 224$. Les labels viennent des segments annotés: \texttt{attention=distracted} devient la classe positive du modèle attention, et \texttt{blouse=badly\_worn} devient la classe positive du modèle blouse/PPE.
@@ -226,7 +226,7 @@ Blouse/PPE mal porté & \texttt{resnet18} & 0.985 & 0.982 & 0.974 & 0.965 \\
 
 Les résultats montrent deux niveaux de confiance différents. Le signal blouse/PPE est le plus fort: les formes et couleurs de la tenue sont visibles dans le crop, et les résultats restent très élevés sur les splits répétés. Le signal attention est exploitable mais moins robuste: il dépend davantage de la pose de la tête, de l'orientation du corps et du cadrage. Les tests d'augmentation confirment aussi cette différence: la blouse/PPE est presque saturée dans plusieurs politiques d'augmentation, alors que l'attention bénéficie d'augmentations modérées et reste plus variable.
 
-Nous avons également testé un actor-holdout, où un acteur est retiré de l'entraînement et utilisé comme test. Dans ce cas, les performances baissent, surtout pour l'attention. Par exemple, les meilleurs scores attention restent autour de $0,80$ de balanced accuracy selon l'acteur retenu, tandis que blouse/PPE varie davantage entre acteurs. Cela confirme que ces modèles sont utiles comme contexte de politique, mais pas assez validés pour remplacer le modèle physique de danger.
+Nous avons également testé un actor-holdout, où un acteur est retiré de l'entraînement et utilisé comme test. Dans ce cas, les performances baissent, surtout pour l'attention. Par exemple, les meilleurs scores attention restent autour de $0,80$ de balanced accuracy selon l'acteur placé en test, tandis que blouse/PPE varie davantage entre acteurs. Cela confirme que ces modèles sont utiles comme contexte de politique, mais pas assez validés pour remplacer le modèle physique de danger.
 
 \section{Protocole d'évaluation}
 L'évaluation est causale: à l'instant $t$, aucune image future n'est utilisée. Les splits sont faits par vidéo parente pour éviter la fuite de données entre fenêtres voisines. Comme le dataset reste petit, nous n'avons pas voulu fonder l'analyse sur une seule séparation train/validation/test. Nous avons donc utilisé des splits répétés avec différentes graines aléatoires: chaque répétition garde l'étanchéité par vidéo parente, puis les métriques sont agrégées. Cette stratégie ne remplace pas un dataset plus grand, mais elle réduit la dépendance à un split chanceux ou défavorable et donne une estimation plus robuste de la variabilité expérimentale. L'entrée physique reste la référence quantitative principale, mais le \texttt{risk\_onset} sert de repère humain: une bonne alerte doit être assez tôt pour se rapprocher de ce qu'un expert verrait avant l'accident, sans multiplier les faux positifs. Les métriques utilisées sont:
@@ -239,7 +239,7 @@ L'évaluation est causale: à l'instant $t$, aucune image future n'est utilisée
 \end{itemize}
 
 \section{Expériences menées}
-Les expériences suivent une logique progressive. Nous avons d'abord testé des baselines tabulaires sur fenêtres de features agrégées, afin de vérifier que les distances à la zone et les vitesses contenaient déjà un signal. Nous avons ensuite entraîné des modèles séquentiels plus adaptés au caractère temporel du problème: TCN, CNN1D, GRU, LSTM et Transformers, avec plusieurs longueurs de fenêtre. Enfin, pour rendre la politique d'alerte plus simple à expliquer, nous avons entraîné une expérience dédiée à sortie unique: \texttt{risk\_present\_now}. Les modèles retenus sont ceux qui respectent le protocole causal et les splits par vidéo parente.
+Les expériences suivent une logique progressive. Nous avons d'abord testé des baselines tabulaires sur fenêtres de features agrégées, afin de vérifier que les distances à la zone et les vitesses contenaient déjà un signal. Nous avons ensuite entraîné des modèles séquentiels plus adaptés au caractère temporel du problème: TCN, CNN1D, GRU, LSTM et Transformers, avec plusieurs longueurs de fenêtre. La politique d'alerte décrite dans ce rapport repose ensuite sur une sortie unique, \texttt{risk\_present\_now}. Les modèles décrits ici respectent tous le protocole causal et les splits par vidéo parente.
 
 Plusieurs ablations ont servi à clarifier ce que le modèle apprenait réellement:
 \begin{itemize}[leftmargin=*]
@@ -263,19 +263,19 @@ Cette sélection évite de présenter un seul chiffre isolé. Le résultat final
 \toprule
 Politique & Early 0,2 & Early 0,3 & Précision & FA/min & Lead médian \\
 \midrule
-TCN60 retenu, seuil 0,55 & 0.850 & 0.642 & 0.859 & 1.574 & 0.394 s \\
-TCN60 plus agressif, seuil 0,35 & 0.850 & 0.683 & 0.661 & 6.015 & 0.456 s \\
+TCN60, seuil 0,55 & 0.850 & 0.642 & 0.859 & 1.574 & 0.394 s \\
+TCN60, seuil 0,35 & 0.850 & 0.683 & 0.661 & 6.015 & 0.456 s \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-Cette table présente deux points de fonctionnement du TCN d'alerte. Le seuil $0,55$ offre le meilleur équilibre pour une alerte opérateur continue: l'avance utile reste élevée et le bruit reste contenu. Le point plus agressif gagne légèrement à $0,3$ s, mais au prix d'une hausse marquée des fausses alertes.
+Cette table présente deux points de fonctionnement du TCN d'alerte. Le seuil $0,55$ correspond à une alerte opérateur continue où l'avance utile reste élevée et le bruit contenu. Le seuil $0,35$ gagne légèrement à $0,3$ s, mais au prix d'une hausse marquée des fausses alertes.
 
 \reportnote{SoftBlue}{\textbf{Interprétation.} La sortie du modèle n'est pas un compte à rebours. C'est un score de certitude instantané. Les colonnes Early 0,2 et Early 0,3 sont calculées après coup: elles disent combien de déclenchements arrivent au moins 0,2 s ou 0,3 s avant l'entrée physique.}
 
 \section{Signal d'arrêt automatique}
-Le score \texttt{risk\_present\_now} est une alerte opérateur. Pour discuter un arrêt automatique, nous gardons séparément le GRU exact-entry court horizon \texttt{survival\_gru\_exact\_entry}. Ici, la question n'est plus ``l'alerte est-elle assez tôt pour un humain?'', mais ``quand le signal de stop se déclenche, l'entrée physique est-elle réellement imminente à $0,2$--$0,3$ s près?''.
+Le score \texttt{risk\_present\_now} est une alerte opérateur. Pour discuter un arrêt automatique, nous utilisons séparément le GRU exact-entry court horizon \texttt{survival\_gru\_exact\_entry}. Ici, la question n'est plus ``l'alerte est-elle assez tôt pour un humain?'', mais ``quand le signal de stop se déclenche, l'entrée physique est-elle réellement imminente à $0,2$--$0,3$ s près?''.
 
 \begin{table}[H]
 \centering
@@ -292,7 +292,7 @@ GRU exact-entry plus couvrant, seuil 0,90 & 51 & 0.502 & 0.741 & 0.221 s \\
 }
 \end{table}
 
-Cette table ne mesure pas si tous les clips dangereux sont couverts. Elle pose la question inverse: quand le signal de stop se déclenche, l'entrée physique est-elle réellement imminente? Le seuil $0,95$ correspond au point strict: moins de déclenchements, mais une bien meilleure probabilité d'être vraiment à moins de $0,2$--$0,3$ s de l'entrée. Le seuil $0,90$ est plus couvrant et part un peu plus tôt, mais il perd nettement en fiabilité. Le compromis se lit donc à l'intérieur de la logique d'arrêt elle-même.
+Cette table ne mesure pas si tous les clips dangereux sont couverts. Elle pose la question inverse: quand le signal de stop se déclenche, l'entrée physique est-elle réellement imminente? Le seuil $0,95$ donne la lecture la plus stricte: moins de déclenchements, mais une bien meilleure probabilité d'être vraiment à moins de $0,2$--$0,3$ s de l'entrée. Le seuil $0,90$ est plus couvrant et part un peu plus tôt, mais il perd nettement en fiabilité. Le compromis se lit donc à l'intérieur de la logique d'arrêt elle-même.
 
 Cette analyse reste secondaire dans ce rapport. Elle est utile pour discuter l'arrêt machine, mais elle est trop tardive pour une réaction humaine confortable.
 
@@ -306,7 +306,7 @@ Le chemin vidéo brut avec extraction de pose mesure 33.20 ms/image en moyenne e
 \end{figure}
 
 \section{Discussion}
-Le point central du projet est la séparation entre prédire un risque et décider une action. Le modèle principal ne prédit pas un compte à rebours. Il dit seulement que, maintenant, la dynamique pose-zone ressemble à un risque visible. Ensuite, l'audit mesure si ce déclenchement arrive assez tôt avant l'entrée physique. Cette formulation évite de surinterpréter des horizons comme \texttt{danger\_within\_0.5s}: dans notre cas, ce label signifie bien ``entrée physique dans $0,5$ s'', mais la politique retenue se base plutôt sur un score unique de risque présent.
+Le point central du projet est la séparation entre prédire un risque et décider une action. Le modèle principal ne prédit pas un compte à rebours. Il dit seulement que, maintenant, la dynamique pose-zone ressemble à un risque visible. Ensuite, l'audit mesure si ce déclenchement arrive assez tôt avant l'entrée physique. Cette formulation évite de surinterpréter des horizons comme \texttt{danger\_within\_0.5s}: dans notre cas, ce label signifie bien ``entrée physique dans $0,5$ s'', mais la politique d'alerte se base sur un score unique de risque présent.
 
 La couche attention/blouse doit aussi être interprétée comme une couche de politique. Elle ne dit pas qu'une mauvaise blouse ou un regard détourné causent l'entrée dans la zone. Elle dit seulement que, si le danger physique est déjà non nul, le système peut devenir plus sensible lorsque le contexte humain est moins favorable. Cette distinction évite de transformer des corrélations d'un petit dataset en conclusion causale trop forte.
 

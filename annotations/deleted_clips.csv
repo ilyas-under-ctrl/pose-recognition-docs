@@ -1,0 +1,2 @@
+video_id,path,actor,coarse_label,fps,frames,duration_s,width,height,removed_at,reason
+captures_zaayd_unsafe_unsafe_blooza_bad_20260512_185739_6d22fa85,captures\zaayd\unsafe\unsafe blooza bad 20260512_185739.mp4,zaayd,unsafe,30.000,58,1.930,1440,720,2026-05-29T23:42:34,useless_unannotated_clip
