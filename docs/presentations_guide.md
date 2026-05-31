@@ -8,7 +8,6 @@ These decks are designed to present, explain, and defend the computer vision mac
 
 ## 1. Safety Defense Slide Deck (Academic/POC Defense)
 * **Presentation Deck**: [`machine-safety-defense-presentation.pptx`](file:///c:/Users/ilyas/Desktop/pose%20recognision/presentations/machine-safety-defense-presentation.pptx)
-* **Speaker Script (French)**: [`machine-safety-defense-speaker-script.md`](file:///c:/Users/ilyas/Desktop/pose%20recognision/presentations/machine-safety-defense-speaker-script.md)
 
 This is the primary 11-slide presentation designed for the final project defense. It fits a precise **15-minute speaking budget**, organized slide-by-slide:
 

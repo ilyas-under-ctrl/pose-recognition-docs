@@ -13,9 +13,6 @@ The manuscript-style academic report detailing our data-collection strategy, seq
 ---
 
 ## 2. Machine-Safety Defense Slide Deck
-The primary slide presentation and accompanying speaking scripts curated for academic defense or industrial stakeholder presentation:
+The primary slide presentation curated for academic defense or industrial stakeholder presentation:
 
 * **[Download Machine-Safety Defense Presentation (PPTX)](assets/downloads/machine-safety-defense-presentation.pptx)**: High-definition 11-slide deck structured for a 15-minute presentation budget.
-* **Accompanying Resources**:
-  * **[Oral Presentation Script (French)](file:///c:/Users/ilyas/Desktop/pose%20recognision/presentations/machine-safety-defense-oral-script-fr.md)**: Word-for-word oral speaking script in French.
-  * **[Speaker Notes & Slides Guide (English)](file:///c:/Users/ilyas/Desktop/pose%20recognision/presentations/machine-safety-defense-speaker-script.md)**: English reference of speaker notes and slide-by-slide time budgets.
