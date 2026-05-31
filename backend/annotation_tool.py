@@ -12,9 +12,10 @@ from PIL import Image, ImageDraw, ImageTk
 
 
 APP_DIR = Path(__file__).resolve().parent
-CAPTURE_DIR = APP_DIR / "captures"
-MANIFEST_PATH = APP_DIR / "captures_manifest.csv"
-ANNOTATION_DIR = APP_DIR / "annotations"
+DATA_DIR = APP_DIR.parent / "data"
+CAPTURE_DIR = DATA_DIR / "captures"
+MANIFEST_PATH = DATA_DIR / "captures_manifest.csv"
+ANNOTATION_DIR = DATA_DIR / "annotations"
 VIDEOS_CSV = ANNOTATION_DIR / "videos.csv"
 SEGMENTS_CSV = ANNOTATION_DIR / "segments.csv"
 EVENTS_CSV = ANNOTATION_DIR / "events.csv"

@@ -1,95 +1,73 @@
-# Phone Live Feed Prototype
+# Fixed-Camera Machine Safety Proof-of-Concept (POC)
 
-This prototype shows a live MJPEG/IP-camera stream from a phone on the laptop and saves snapshots or recordings on the laptop.
+This repository contains the fixed-camera pose recognition proof of concept designed to predict machine-safety risks. The system monitors operator safety by analyzing person keypoints, temporal danger-zone penetration, attention classification, blouse/clothing closure status, and a fused operational risk score.
 
-## Phone setup
+---
 
-1. On Windows, enable **Mobile hotspot**.
-2. Connect the phone to that hotspot.
-3. Open an IP camera app on the phone and start the stream.
-4. Copy the stream URL shown by the app. It usually looks like one of these:
+## 📂 Repository Structure
 
-```text
-http://192.168.137.x:8080/video
-http://192.168.137.x:8080/stream.mjpg
-```
+The project files are organized to separate research scripts, backend modules, frontend dashboards, and datasets:
 
-Use the actual URL displayed by the app.
+* **`backend/`**: Core application logic.
+  * [`annotation_tool.py`](backend/annotation_tool.py): Legacy desktop Tkinter annotation app.
+  * [`web_annotator_server.py`](backend/web_annotator_server.py): HTTP Server providing endpoints for the web UI.
+  * [`validate_annotations.py`](backend/validate_annotations.py): Local schema and logical database validator.
+  * [`prepare_web_media_cache.py`](backend/prepare_web_media_cache.py): FFmpeg transcoding script for browser video support.
+  * [`requirements.txt`](backend/requirements.txt): Core application and server dependencies.
+* **`dashboard/web_annotator/`**: Web application assets (HTML/CSS/JS) for the browser annotation interface.
+* **`data/`**: Project dataset and local database storage.
+  * `captures/`: Whitelisted MP4 video clips (including a sample video at `data/captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` for out-of-the-box execution).
+  * `annotations/`: Local CSV/JSON databases (`videos.csv`, `segments.csv`, `events.csv`, `zones.json`).
+  * `captures_manifest.csv`: Global master list of video files.
+* **`jobs/`**: Pre-configured Windows batch script shortcuts (`run_web_annotation_tool.bat`, `run_annotation_tool.bat`, `prepare_web_media_cache.bat`).
+* **`ml/` & `pipelines/` & Root Directory**: 39 Machine Learning scripts, sequence training pipelines, ensembling metrics, and Jupyter notebooks (`notebooks_experiences/`) kept at the root level to guarantee uninterrupted importing and reproducible execution.
 
-## Laptop setup
+---
 
-Install dependencies:
+## ⚡ Quick Start & Run Instructions
 
+### 1. Install Application Dependencies
+Install the required packages for the annotation tools and servers:
 ```powershell
-python -m pip install -r requirements.txt
+python -m pip install -r backend/requirements.txt
 ```
 
-Run the viewer:
+### 2. Launch the Web Annotation Tool
+Start the native-style web browser annotator:
+```powershell
+python backend/web_annotator_server.py
+```
+Then navigate to **[http://127.0.0.1:8765](http://127.0.0.1:8765)** in your web browser. 
 
+Alternatively, you can double-click **`jobs/run_web_annotation_tool.bat`**.
+
+### 3. Pre-prepare Browser Playback Cache
+Browser-native players require H.264 video. If video seeking or playback is sluggish, transcode your video folder to a fast-seeking H.264 cache:
+```powershell
+python backend/prepare_web_media_cache.py
+```
+This saves optimized playable clips under `data/.web_media_cache/` without altering your raw video assets.
+
+### 4. Validate Annotations
+After modifying or adding annotations, run the verification tool to check database integrity, segment bounds, and polygon structures:
+```powershell
+python backend/validate_annotations.py
+```
+
+---
+
+## 📱 Phone Live Feed Streamer
+The repository includes a live mobile streamer prototype to view IP camera streams from a smartphone with live YOLO / MediaPipe skeleton overlay:
 ```powershell
 python phone_feed_app.py
 ```
+See the in-app instructions to connect your mobile hotspot, stream URL, and configure low-latency pose models.
 
-Paste the phone stream URL, then click **Connect**.
+---
 
-To test whether the phone stream is the bottleneck, choose **Webcam 0** or **Webcam 2** from the source dropdown and click **Connect**.
-
-Enable pose detection to draw live person keypoints/skeletons on the stream. Use **MediaPipe** for the lowest latency and **YOLO** for heavier comparison. The first MediaPipe use downloads `pose_landmarker_lite.task`; the first YOLO use may download `yolo11n-pose.pt`.
-
-If the preview lags, lower **Pose FPS** or **Size** first. The live video stays current while YOLO runs in the background.
-
-## Notes
-
-- Start with 1280x720 at 30 FPS if the phone app lets you choose.
-- For lower latency, use **MediaPipe**, 640x480, **Pose FPS** around 15, and **Size** around 320.
-- For YOLO on CPU, keep **Size** at 320 and reduce **Pose FPS** if needed. On CUDA GPUs, 320-480 is usually usable.
-- Recordings and snapshots are saved in `captures/`.
-- If **YOLO Pose** is enabled, recordings and snapshots include the pose overlay.
-- Recording is laptop-side, so it works even if the phone app only streams video.
-
-## Annotation workflow
-
-Recommended: use the browser-based annotation tool to label the existing dataset for the real-time safety models:
-
-```powershell
-python web_annotator_server.py
-```
-
-Then open:
-
-```text
-http://127.0.0.1:8765
-```
-
-or run `run_web_annotation_tool.bat`.
-
-The older Tkinter tool is still available:
-
-```powershell
-python annotation_tool.py
-```
-
-or run `run_annotation_tool.bat`.
-
-If browser playback is slow the first time a clip opens, prepare all browser-playable video copies up front:
-
-```powershell
-python prepare_web_media_cache.py
-```
-
-This writes cached H.264 copies under `.web_media_cache/` and leaves the original dataset unchanged.
-
-The tool writes simple CSV/JSON annotations under `annotations/`:
-
-- `videos.csv` for the indexed clips.
-- `segments.csv` for attention and blouse state over time.
-- `events.csv` for danger/no-danger events.
-- `zones.json` for the fixed projected danger-volume polygon.
-
-Validate saved annotations with:
-
-```powershell
-python validate_annotations.py
-```
-
-See `docs/architecture_and_annotation.md` and `docs/annotation_tool_usage.md` for the architecture and labeling rules.
+## 📖 Project Documentation
+Detailed technical specifications, modeling runbooks, and artifacts are located in the `docs/` folder:
+* **[Architecture & Design Principles](docs/architecture_and_annotation.md)**: Claims, dataset design, and labeling logic.
+* **[Annotation Tool Guidelines](docs/annotation_tool_usage.md)**: In-depth usage guide and hotkeys.
+* **[ML Autonomous Training Runbook](docs/ml_autonomous_training_runbook.md)**: Training pipelines, model configurations, and target metrics.
+* **[Deliverables & Downloads](docs/artifacts.md)**: Access to the compiled academic report (PDF) and stakeholders defense presentation (PPTX).

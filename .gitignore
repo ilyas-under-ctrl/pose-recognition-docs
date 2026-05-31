@@ -3,6 +3,9 @@
 !.gitignore
 !.readthedocs.yaml
 !README.md
+!README_API.md
+!README_BACKEND.md
+!GUIDE_UTILISATION.md
 !mkdocs.yml
 !docs/
 !docs/**
@@ -13,34 +16,30 @@
 !presentations/
 !presentations/**
 
-# Whitelist Annotations Tool & Support Scripts
-!web_annotator_server.py
-!annotation_tool.py
-!prepare_web_media_cache.py
-!validate_annotations.py
-!clean_annotations.py
-!run_web_annotation_tool.bat
-!run_annotation_tool.bat
-!prepare_web_media_cache.bat
-!requirements.txt
-!captures_manifest.csv
+# Whitelist organized folders
+!backend/
+!backend/**
 
-# Whitelist Annotations directory
-!annotations/
-!annotations/**
+!dashboard/
+!dashboard/**
 
-# Whitelist Web Annotator UI assets
-!web_annotator/
-!web_annotator/**
+!data/
+!data/captures_manifest.csv
+!data/annotations/
+!data/annotations/**
+!data/captures/
+!data/captures/ilyas/
+!data/captures/ilyas/unsafe/
+!data/captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4
 
-# Whitelist Sample Video
-!captures/
-!captures/ilyas/
-!captures/ilyas/unsafe/
-!captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4
+!jobs/
+!jobs/**
 
 site/
 academic_report/*.aux
 academic_report/*.log
 academic_report/*.out
+
+**/__pycache__/
+*.pyc
 

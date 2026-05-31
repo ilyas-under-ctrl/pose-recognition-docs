@@ -1,16 +1,16 @@
 # Annotation Tool Usage
 
 To make this proof-of-concept repository immediately runnable, we have whitelisted and pushed a lightweight sample video directly into Git:
-- **Sample Video Path**: `captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
+- **Sample Video Path**: `data/captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
 
-When you run the web annotator server or the legacy Tkinter tool, this video will automatically appear in the active video queue, allowing you to try out the canvas editing, segment boundary marking, and event timing timeline with no extra setup.
+When you run the web annotator server or the Tkinter tool, this video will automatically appear in the active video queue, allowing you to try out the canvas editing, segment boundary marking, and event timing timeline with no extra setup.
 
 ## Recommended Web Annotator (Preferred UI)
 
-Run the Python web server in the root of the repository:
+Run the Python web server from the root of the repository:
 
 ```powershell
-python web_annotator_server.py
+python backend/web_annotator_server.py
 ```
 
 Then open your browser and navigate to:
@@ -22,10 +22,10 @@ http://127.0.0.1:8765
 Alternatively, on Windows you can double-click:
 
 ```text
-run_web_annotation_tool.bat
+jobs/run_web_annotation_tool.bat
 ```
 
-The browser version is the preferred UI. It uses native video playback, canvas overlays, and a video-editor-style timeline while saving the same CSV/JSON annotation files under `annotations/`.
+The browser version is the preferred UI. It uses native video playback, canvas overlays, and a video-editor-style timeline while saving the same CSV/JSON annotation files under `data/annotations/`.
 
 ![Browser annotation tool preview](assets/images/web_annotator_preview.png)
 
@@ -40,23 +40,23 @@ The original clips are encoded as `mp4v`, which many browsers do not play direct
 The first time a clip opens, it may be slow because that cached copy is being prepared. To remove that delay for the whole dataset, click `Prepare All Clips` in the browser UI, or run:
 
 ```powershell
-python prepare_web_media_cache.py
+python backend/prepare_web_media_cache.py
 ```
 
 This can take several minutes, but it is a one-time setup. After a clip is cached, it opens quickly.
 
 The cache is encoded with dense keyframes for annotation. That makes slider seeking and left/right frame stepping much more reliable than normal playback-optimized MP4 files, at the cost of a larger cache folder.
 
-Legacy Tkinter app:
+Tkinter app:
 
 ```powershell
-python annotation_tool.py
+python backend/annotation_tool.py
 ```
 
 or double-click:
 
 ```text
-run_annotation_tool.bat
+jobs/run_annotation_tool.bat
 ```
 
 ## First Pass: Define The Zone
@@ -72,7 +72,7 @@ run_annotation_tool.bat
 9. Right-click a point to delete it.
 10. Press `Save Zone`.
 
-The zone is saved to `annotations/zones.json`.
+The zone is saved to `data/annotations/zones.json`.
 
 This is a projected 2D outline of the 3D volume. It is used as a feature and annotation reference, not as proof of true 3D entry.
 
@@ -182,10 +182,10 @@ Danger sources are multi-label. If both hands/arms and head enter the volume at 
 
 ## Output Files
 
-- `annotations/videos.csv`
-- `annotations/segments.csv`
-- `annotations/events.csv`
-- `annotations/zones.json`
+- `data/annotations/videos.csv`
+- `data/annotations/segments.csv`
+- `data/annotations/events.csv`
+- `data/annotations/zones.json`
 
 Do not edit the video files. The tool only writes annotations.
 
@@ -194,7 +194,7 @@ Do not edit the video files. The tool only writes annotations.
 Run this after an annotation session:
 
 ```powershell
-python validate_annotations.py
+python backend/validate_annotations.py
 ```
 
 The validator checks that video IDs exist, segment times are inside the clip, event frames are valid, labels are from the allowed set, and the saved danger-zone polygon is well formed.

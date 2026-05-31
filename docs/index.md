@@ -19,23 +19,23 @@ The research pipeline combines trajectory danger risk, attention risk, and blous
 - [Architecture and Annotation](architecture_and_annotation.md): project framing, defensible claims, dataset grounding, annotation strategy, and reliability boundaries.
 - [Annotation Tool Usage](annotation_tool_usage.md): how to run the browser annotation tool, define the danger zone, label videos, and validate annotations.
 - [ML Autonomous Training Runbook](ml_autonomous_training_runbook.md): durable research plan, model targets, augmentation policy, evaluation criteria, experiment status, and final acceptance criteria.
-- [Project Artifacts](artifacts.md): downloadable reports, presentation decks, and pointers to the experiment notebooks.
+- [Project Artifacts](artifacts.md): downloadable academic report and final presentation deck.
 
 ## Quick Start & Sample Video
 
 To allow immediate, out-of-the-box execution, a lightweight sample video from the dataset is whitelisted and pushed directly in this Git repository:
-- **Path**: `captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
+- **Path**: `data/captures/ilyas/unsafe/unsafe blooza good  20260512_190928.mp4` (3.2 MB)
 
 ### Run instructions:
 
 1. **Install dependencies**:
    ```powershell
-   python -m pip install -r requirements.txt
+   python -m pip install -r backend/requirements.txt
    ```
 
 2. **Run the browser annotation tool**:
    ```powershell
-   python web_annotator_server.py
+   python backend/web_annotator_server.py
    ```
 
 3. **Annotate in your browser**:
@@ -44,7 +44,7 @@ To allow immediate, out-of-the-box execution, a lightweight sample video from th
 4. **Validate annotations**:
    Ensure all saved outputs are fully syntactically correct and conform to schema:
    ```powershell
-   python validate_annotations.py
+   python backend/validate_annotations.py
    ```
 
 ## Scope

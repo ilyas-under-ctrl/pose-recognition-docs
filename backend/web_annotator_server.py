@@ -31,8 +31,8 @@ from annotation_tool import (
 )
 
 
-WEB_DIR = APP_DIR / "web_annotator"
-WEB_MEDIA_DIR = APP_DIR / ".web_media_cache"
+WEB_DIR = APP_DIR.parent / "dashboard" / "web_annotator"
+WEB_MEDIA_DIR = APP_DIR.parent / "data" / ".web_media_cache"
 CACHE_VERSION = "seekv2"
 DEFAULT_PORT = 8765
 CACHE_JOB = {

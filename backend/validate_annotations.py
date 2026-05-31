@@ -53,7 +53,7 @@ def main():
         if video_id in by_id:
             errors.append(f"duplicate video_id in videos.csv: {video_id}")
         by_id[video_id] = row
-        if not (APP_DIR / row["path"]).exists():
+        if not (APP_DIR.parent / "data" / row["path"]).exists():
             errors.append(f"missing video file for {video_id}: {row['path']}")
 
     for row in segments:
