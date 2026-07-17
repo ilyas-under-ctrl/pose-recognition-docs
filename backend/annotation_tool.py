@@ -11,8 +11,8 @@ import cv2
 from PIL import Image, ImageDraw, ImageTk
 
 
-APP_DIR = Path(__file__).resolve().parent
-DATA_DIR = APP_DIR.parent / "data"
+APP_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = APP_DIR / "data"
 CAPTURE_DIR = DATA_DIR / "captures"
 MANIFEST_PATH = DATA_DIR / "captures_manifest.csv"
 ANNOTATION_DIR = DATA_DIR / "annotations"
@@ -164,7 +164,7 @@ def discover_videos():
                 path = CAPTURE_DIR / actor / coarse_label / name
                 if not path.exists():
                     continue
-                relative_path = path.relative_to(APP_DIR)
+                relative_path = path.relative_to(DATA_DIR)
                 fps = parse_fps(row.get("fps", "30"))
                 frames = int(float(row.get("frames") or 0))
                 duration = float(row.get("duration_s") or 0.0)
@@ -185,7 +185,7 @@ def discover_videos():
                 seen_paths.add(str(relative_path))
 
     for path in sorted(CAPTURE_DIR.rglob("*.mp4")):
-        relative_path = path.relative_to(APP_DIR)
+        relative_path = path.relative_to(DATA_DIR)
         if str(relative_path) in seen_paths:
             continue
         parts = relative_path.parts

@@ -19,6 +19,7 @@ from annotation_tool import (
     ANNOTATION_DIR,
     APP_DIR,
     BODY_PARTS,
+    DATA_DIR,
     EVENTS_CSV,
     EVENT_HEADERS,
     EVENT_ROLES,
@@ -31,8 +32,8 @@ from annotation_tool import (
 )
 
 
-WEB_DIR = APP_DIR.parent / "dashboard" / "web_annotator"
-WEB_MEDIA_DIR = APP_DIR.parent / "data" / ".web_media_cache"
+WEB_DIR = APP_DIR / "dashboard" / "web_annotator"
+WEB_MEDIA_DIR = APP_DIR / "data" / ".web_media_cache"
 CACHE_VERSION = "seekv2"
 DEFAULT_PORT = 8765
 CACHE_JOB = {
@@ -93,13 +94,17 @@ def read_json_body(handler):
 
 
 def safe_media_path(relative_path):
-    candidate = (APP_DIR / relative_path).resolve()
     root = APP_DIR.resolve()
-    if os.path.commonpath([str(root), str(candidate)]) != str(root):
-        raise ValueError("path escapes project directory")
-    if not candidate.exists() or not candidate.is_file():
-        raise FileNotFoundError(candidate)
-    return candidate
+    candidates = [
+        (APP_DIR / relative_path).resolve(),
+        (DATA_DIR / relative_path).resolve(),
+    ]
+    for candidate in candidates:
+        if os.path.commonpath([str(root), str(candidate)]) != str(root):
+            raise ValueError("path escapes project directory")
+        if candidate.exists() and candidate.is_file():
+            return candidate
+    raise FileNotFoundError(candidates[0])
 
 
 def cached_media_path(relative_path):

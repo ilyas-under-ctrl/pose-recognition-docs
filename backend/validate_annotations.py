@@ -9,6 +9,7 @@ from annotation_tool import (
     ATTENTION_LABELS,
     BLOUSE_LABELS,
     BODY_PARTS,
+    DATA_DIR,
     EVENTS_CSV,
     EVENT_HEADERS,
     EVENT_ROLES,
@@ -36,6 +37,10 @@ def as_float(value, default=None):
         return default
 
 
+def video_file_exists(relative_path):
+    return (APP_DIR / relative_path).exists() or (DATA_DIR / relative_path).exists()
+
+
 def main():
     errors = []
     warnings = []
@@ -53,7 +58,7 @@ def main():
         if video_id in by_id:
             errors.append(f"duplicate video_id in videos.csv: {video_id}")
         by_id[video_id] = row
-        if not (APP_DIR.parent / "data" / row["path"]).exists():
+        if not video_file_exists(row["path"]):
             errors.append(f"missing video file for {video_id}: {row['path']}")
 
     for row in segments:
